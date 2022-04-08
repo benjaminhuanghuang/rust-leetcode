@@ -12,6 +12,20 @@ pub struct Solution;
 impl Solution {
   pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
     // value -> index:usize
+    let mut hash = HashMap::new();
+
+    for (i, num) in nums.iter().enumerate() {
+      let complement = target - *num;
+      if hash.contains_key(&complement) {
+        return vec![hash[&complement], i as i32];
+      }
+      hash.insert(num, i as i32);
+    }
+    vec![]
+  }
+
+  pub fn two_sum_2(nums: Vec<i32>, target: i32) -> Vec<i32> {
+    // value -> index:usize
     let mut hash: HashMap<i32, usize> = HashMap::new();
 
     for (i, num) in nums.iter().enumerate() {
@@ -34,17 +48,21 @@ impl Solution {
       }
     }
     vec![]
-  }  
+  }
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
 
+  #[test]
+  fn test_success() {
+    assert_eq!(Solution::two_sum(vec![2, 7, 11, 15], 9), vec![0, 1]);
+  }
 
   #[test]
-  fn test_success() { 
-    assert_eq!(Solution::two_sum(vec![2, 7, 11, 15], 9), vec![0, 1]);
+  fn test_2_success() {
+    assert_eq!(Solution::two_sum_2(vec![2, 7, 11, 15], 9), vec![0, 1]);
   }
 
   #[test]
