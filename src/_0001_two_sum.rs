@@ -23,13 +23,32 @@ impl Solution {
     }
     vec![]
   }
+
+  pub fn two_sum_naive(nums: Vec<i32>, target: i32) -> Vec<i32> {
+    for (i, num1) in nums.iter().enumerate() {
+      //enumerate() starts from 0
+      for (j, num2) in nums.iter().skip(i + 1).enumerate() {
+        if num1 + num2 == target {
+          return vec![i as i32, (j + 1 + i) as i32];
+        }
+      }
+    }
+    vec![]
+  }  
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
+
+
   #[test]
-  fn test_add() {
+  fn test_success() { 
     assert_eq!(Solution::two_sum(vec![2, 7, 11, 15], 9), vec![0, 1]);
+  }
+
+  #[test]
+  fn test_naive_success() {
+    assert_eq!(Solution::two_sum_naive(vec![2, 7, 11, 15], 9), vec![0, 1]);
   }
 }
