@@ -11,6 +11,7 @@ pub struct Solution;
 
 impl Solution {
   pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+    // value -> index:usize
     let mut hash: HashMap<i32, usize> = HashMap::new();
 
     for (i, num) in nums.iter().enumerate() {
