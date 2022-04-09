@@ -17,7 +17,7 @@ impl Solution {
       
     let mut l1 = &l1;
     let mut l2 = &l2;
-    
+
     let mut carry = 0;
     let mut result = None;
     let mut cur = &mut result;
@@ -58,7 +58,7 @@ mod tests {
   }
 
   #[test]
-  fn test_success() {
+  fn test_add_two_numbers_success() {
     assert_eq!(
       Solution::add_two_numbers(to_list(vec![2, 4, 3]), to_list(vec![5, 6, 4])),
       to_list(vec![7, 0, 8])
