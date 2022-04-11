@@ -1,31 +1,31 @@
 extern crate reqwest;
 
-use clap::{Command, Arg};
+use clap::{Arg, Command};
 use std::error::Error;
-use std::fs::File;
+use std::fs::{File,OpenOptions};
 use std::io::{self, BufRead, BufReader};
 
 use std::env::{args, Args};
 
-const LEETCODE_URL:&str = "https://leetcode.com";
-const LEETCODE_PROBLEMS_BASE_URL:&str = "https://leetcode.com/problems/";
-/* 
-  LEETCODE_PROBLEMS_API_URL returns all problem list 
+const LEETCODE_URL: &str = "https://leetcode.com";
+const LEETCODE_PROBLEMS_BASE_URL: &str = "https://leetcode.com/problems/";
+/*
+  LEETCODE_PROBLEMS_API_URL returns all problem list
   [
     {
-      question_id, 
+      question_id,
       quesiton_title
       ...
     }
   ]
 */
-const LEETCODE_PROBLEMS_API_URL:&str = "https://leetcode.com/api/problems/algorithms/";
+const LEETCODE_PROBLEMS_API_URL: &str = "https://leetcode.com/api/problems/algorithms/";
 /*
 
 */
-const LEETCODE_GRPAHQL_API_URL:&str = "https://leetcode.com/graphql";
+const LEETCODE_GRPAHQL_API_URL: &str = "https://leetcode.com/graphql";
 
-const ROOT_PATH:&str = "/Users/bhuang/ben-github/rust-leetcode/";
+const ROOT_PATH: &str = "/Users/bhuang/ben-github/rust-leetcode/";
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -36,7 +36,7 @@ type MyResult<T> = Result<T, Box<dyn Error>>;
 pub struct Config {
   question_ids: Vec<String>,
   reload: bool,
-  output_folder: String
+  output_folder: String,
 }
 
 // --------------------------------------------------
@@ -45,7 +45,6 @@ pub fn get_args() -> MyResult<Config> {
     .version("0.1.0")
     .author("Benjamin <benjamin@gmail.com>")
     .about("Rust Leetcode client")
-
     .arg(
       Arg::with_name("ids")
         .value_name("IDS")
@@ -77,16 +76,15 @@ pub fn get_args() -> MyResult<Config> {
   })
 }
 
-
 // --------------------------------------------------
 pub fn run(config: Config) -> MyResult<()> {
   println!("..... The config: {:?}", config);
   if config.reload {
     reload_questions_data();
   }
-  
+
   for id in config.question_ids {
-    
+    generate_solution(&config, &id);
   }
   Ok(())
 }
@@ -96,11 +94,11 @@ pub fn run(config: Config) -> MyResult<()> {
 */
 fn reload_questions_data() {
   let resp_text = reqwest::get(LEETCODE_PROBLEMS_API_URL)
-  .expect("")
-  .text().expect("");
+    .expect("")
+    .text()
+    .expect("");
 
-  println!("{}", resp_text);
-
+  //println!("{}", resp_text);
 
   // match  reqwest::get(LEETCODE_PROBLEMS_API_URL){
   //   Ok(mut response) =>{
@@ -115,4 +113,18 @@ fn reload_questions_data() {
   //   }
   //   //Err(_) => println!("Coule not make the request")
   // }
+}
+
+fn generate_solution(config: &Config, id: &str) -> std::io::Result<()> {
+  let file_name = format!("{:>04}", id);
+  let full_path = config.output_folder.clone() + "/" + &file_name;
+  println!("full_path is {}", full_path);
+  let mut file = OpenOptions::new()
+    .read(true)
+    .write(true)
+    .open(full_path)?;
+
+  //file.write("COVER")?;
+
+  Ok(())
 }
