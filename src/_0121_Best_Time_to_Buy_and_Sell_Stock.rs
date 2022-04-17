@@ -5,7 +5,6 @@ Easy
 */
 pub struct Solution;
 
-
 /*
   1. find min buy
 */
@@ -14,10 +13,9 @@ impl Solution {
     if prices.len() < 2 {
       return 0;
     }
-     
     let mut max_profit: i32 = 0;
-    let mut lowest_price= i32::MAX;
-    for (_, price) in prices.iter().enumerate() {
+    let mut lowest_price = i32::MAX;
+    for price in prices.iter() {
       if *price < lowest_price {
         lowest_price = *price;
       }
