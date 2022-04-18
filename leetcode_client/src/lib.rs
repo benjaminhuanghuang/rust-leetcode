@@ -1,11 +1,14 @@
 extern crate reqwest;
 
+use std::io::prelude::*;
 use clap::{Arg, Command};
 use std::error::Error;
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, BufReader};
-
 use std::env::{args, Args};
+use serde_derive::Deserialize;
+use serde_derive::Serialize;
+
 
 const LEETCODE_URL: &str = "https://leetcode.com";
 const LEETCODE_PROBLEMS_BASE_URL: &str = "https://leetcode.com/problems/";
@@ -83,7 +86,7 @@ pub fn run(config: Config) -> MyResult<()> {
         reload_questions_data();
     }
 
-    for id in config.question_ids {
+    for id in config.question_ids.iter() {
         generate_solution(&config, &id);
     }
     Ok(())
@@ -99,23 +102,24 @@ fn reload_questions_data() {
         .expect("");
 
     //println!("{}", resp_text);
-
-    // Open a file in write-only (ignoring errors).
-    // This creates the file if it does not exist (and empty the file if it exists).
-    let mut file = File::create(temp_file).unwrap();
-
-    // Write a &str in the file (ignoring the result).
-    writeln!(&mut file, "Hello World!").unwrap();
-
-    // Write a byte string.
-    file.write(b"Bytes\n").unwrap();
+    let mut f = File::create("leetcode_problems.json").unwrap();
+    f.write_all(resp_text.as_bytes()).unwrap();
 }
 
+
+/*
+GetProblemDetailByFrontendId calls Leetcode GraphQL API https://leetcode.com/graphql to get problem detail by title slug
+*/
+fn get_problem_detail(frontendId: &str) -> std::io::Result<()> {
+
+
 fn generate_solution(config: &Config, id: &str) -> std::io::Result<()> {
-    let file_name = format!("{:>04}", id);
+    let file_name = format!("_{:>04}.rs", id);
     let full_path = config.output_folder.clone() + "/" + &file_name;
-    println!("full_path is {}", full_path);
-    let mut file = OpenOptions::new().read(true).write(true).open(full_path)?;
+    //println!("full_path is {}", full_path);
+
+    let mut f = File::create(full_path).unwrap();
+    f.write_all(resp_text.as_bytes()).unwrap();
 
     //file.write("COVER")?;
 
