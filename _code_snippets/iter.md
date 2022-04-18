@@ -1,6 +1,7 @@
 
 
-## index value
+## Iter of vec
+Index and value
 ```
   for (i, num1) in nums.iter().enumerate() {
     //enumerate() starts from 0
@@ -13,7 +14,7 @@
   vec![]
 ```
 
-## value
+Value
 ```
 for price in prices.iter {
 }
