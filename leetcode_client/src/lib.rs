@@ -113,7 +113,8 @@ fn generate_solution(config: &Config, id: &str) {
   // find detail in the json file_name
   let json_file = std::fs::File::open("leetcode_problems.json").expect("read file error!");
   let leetcode: entities::Leetcode = serde_json::from_reader(json_file).unwrap();
-  println!("len: {:#?}", leetcode.stat_status_pairs.len());
+
+  println!("len: {:#?}", leetcode);
 
   let file_name = format!("_{:>04}.rs", id);
   let full_path = config.output_folder.clone() + "/" + &file_name;
