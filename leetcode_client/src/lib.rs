@@ -113,13 +113,48 @@ fn generate_solution(config: &Config, id: &str) {
   // find detail in the json file_name
   let json_file = std::fs::File::open("leetcode_problems.json").expect("read file error!");
   let leetcode: entities::Leetcode = serde_json::from_reader(json_file).unwrap();
+  let front_id: u32 = id.parse().unwrap();
+  let target = leetcode
+    .stat_status_pairs
+    .iter()
+    .find(|x| x.stat.frontend_question_id == front_id);
 
-  println!("len: {:#?}", leetcode);
+  match target {
+    Some(state_status_pair) => {
+      let question_title = &state_status_pair.stat.question__title;
+      let question_title_slug = &state_status_pair.stat.question__title_slug;
+      let question_difficulty = entities::Level::from_u32(state_status_pair.difficulty.level);
 
-  let file_name = format!("_{:>04}.rs", id);
-  let full_path = config.output_folder.clone() + "/" + &file_name;
-  //println!("full_path is {}", full_path);
+      let file_header = format!(
+        r#"
+/*
+{}. {}
 
-  let mut f = File::create(full_path).unwrap();
-  f.write_all("test".as_bytes()).unwrap();
+https://leetcode.com/problems/{}/
+
+{}
+*/
+pub struct Solution;
+
+impl Solution {{
+  pub fn implementation() {{
+
+  }}
+}}"#,
+        id, question_title, question_title_slug, question_difficulty
+      );
+      let full_path = format!(
+        "{}/_{:0>4}_{}.rs",
+        &config.output_folder,
+        id,
+        question_title_slug.replace("-", "_")
+      );
+      //println!("{}", full_path);
+      let mut f = File::create(full_path).unwrap();
+      f.write_all(file_header.as_bytes()).unwrap();
+    }
+    None => {
+      println!("Can not find problem #{}", id);
+    }
+  }
 }
