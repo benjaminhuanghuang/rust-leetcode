@@ -126,8 +126,7 @@ fn generate_solution(config: &Config, id: &str) {
       let question_difficulty = entities::Level::from_u32(state_status_pair.difficulty.level);
 
       let file_header = format!(
-        r#"
-/*
+        r#"/*
 {}. {}
 
 https://leetcode.com/problems/{}/
