@@ -127,11 +127,11 @@ fn generate_solution(config: &Config, id: &str) {
 
       let file_header = format!(
         r#"/*
-{}. {}
+  {}. {}
 
-https://leetcode.com/problems/{}/
+  https://leetcode.com/problems/{}/
 
-{}
+  {}
 */
 pub struct Solution;
 
