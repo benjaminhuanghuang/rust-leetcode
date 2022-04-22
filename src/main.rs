@@ -1,7 +1,10 @@
 use leetcode::_0001_two_sum::Solution;
+use leetcode::data_structure::list_node::*;
+
 
 fn main()
 {
-  assert_eq!(Solution::two_sum(vec![2, 7, 11, 15], 9), vec![0, 1]);
+
+  assert!(list_equal(to_list(vec![3, 2]), to_list(vec![3, 2, 1])));
 }
 

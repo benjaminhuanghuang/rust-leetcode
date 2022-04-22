@@ -37,14 +37,24 @@ pub fn list_equal(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> bool 
     l2 = node2.next;
   }
 
-  l1.is_none() && l1.is_none()
+  l1.is_none() && l2.is_none()
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
   #[test]
-  fn test_list_equal() {
+  fn test_list_equal_success() {
     assert!(list_equal(to_list(vec![3, 2, 1]), to_list(vec![3, 2, 1])));
+  }
+
+  #[test]
+  fn test_list_equal_different_len_success() {
+    assert!(!list_equal(to_list(vec![3, 2]), to_list(vec![3, 2, 1])));
+  }
+
+  #[test]
+  fn test_list_equal_failed() {
+    assert!(!list_equal(to_list(vec![3, 1, 1]), to_list(vec![3, 2, 1])));
   }
 }
