@@ -2,7 +2,7 @@ mod entities;
 
 use clap::{Arg, Command};
 use std::error::Error;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::io::prelude::*;
 
 /*
@@ -86,8 +86,11 @@ pub fn run(config: Config) -> MyResult<()> {
 /*
 
 */
-fn download_questions_data(){
-  let resp_text = reqwest::blocking::get(LEETCODE_PROBLEMS_API_URL).unwrap().text().unwrap();
+fn download_questions_data() {
+  let resp_text = reqwest::blocking::get(LEETCODE_PROBLEMS_API_URL)
+    .unwrap()
+    .text()
+    .unwrap();
 
   // println!("{}", resp_text);
   // Save json response to "leetcode_problems.json"
@@ -123,15 +126,17 @@ fn query_question_data(title_slug: &str) -> String {
 	}}"#,
     title_slug
   );
-  println!("----payload    {:#?}", payload);  
+  println!("----payload    {:#?}", payload);
   let client = reqwest::blocking::Client::new();
 
   let res = client
     .post(LEETCODE_GRPAHQL_API_URL)
     .body(payload)
-    .send().unwrap();
-  
-    println!("----res    {:#?}", res);  
+    .send()
+    .unwrap();
+
+  println!("----res    {:#?}", res);
+
   //res
   "".to_string()
 }
@@ -152,7 +157,7 @@ fn generate_solution(config: &Config, id: &str) {
   let question_difficulty = entities::Level::from_u32(state_status_pair.difficulty.level);
   // query code snippet  >>> CSRF verification failed
   // let response = query_question_data(&question_title_slug);
-  // let data: entities::QuesitonData = serde_json::from_str(&response).unwrap();  
+  // let data: entities::QuesitonData = serde_json::from_str(&response).unwrap();
   // let code_snippet = data
   //   .question
   //   .code_snippets
@@ -204,6 +209,23 @@ pub struct Solution;
   //println!("full_path: {}", full_path);
   let mut f = File::create(full_path).unwrap();
   f.write_all(solution_content.as_bytes()).unwrap();
+
+  // add "pub mod" to lib.rs
+  let mod_line = format!(
+    "pub mod _{:0>4}_{};",
+    id,
+    question_title_slug.replace("-", "_")
+  );
+  add_mod(&mod_line);
+}
+
+fn add_mod(mod_line: &str) {
+  let mut file = OpenOptions::new()
+    .write(true)
+    .append(true)
+    .open("../src/lib.rs")
+    .unwrap();
+  file.write_all(mod_line.as_bytes());
 }
 
 #[cfg(test)]
