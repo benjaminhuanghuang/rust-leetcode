@@ -1,15 +1,10 @@
 mod entities;
 
 use clap::{Arg, Command};
-use serde::{Deserialize, Serialize};
-use std::env::{args, Args};
 use std::error::Error;
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::prelude::*;
-use std::io::{self, BufRead, BufReader};
 
-const LEETCODE_URL: &str = "https://leetcode.com";
-const LEETCODE_PROBLEMS_BASE_URL: &str = "https://leetcode.com/problems/";
 /*
   LEETCODE_PROBLEMS_API_URL returns all problem list
   [
@@ -22,11 +17,9 @@ const LEETCODE_PROBLEMS_BASE_URL: &str = "https://leetcode.com/problems/";
 */
 const LEETCODE_PROBLEMS_API_URL: &str = "https://leetcode.com/api/problems/algorithms/";
 /*
-
+    graphql returns question data
 */
 const LEETCODE_GRPAHQL_API_URL: &str = "https://leetcode.com/graphql";
-
-const ROOT_PATH: &str = "/Users/bhuang/ben-github/rust-leetcode/";
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -93,11 +86,8 @@ pub fn run(config: Config) -> MyResult<()> {
 /*
 
 */
-fn download_questions_data() {
-  let resp_text = reqwest::get(LEETCODE_PROBLEMS_API_URL)
-    .expect("")
-    .text()
-    .expect("");
+fn download_questions_data(){
+  let resp_text = reqwest::blocking::get(LEETCODE_PROBLEMS_API_URL).unwrap().text().unwrap();
 
   // println!("{}", resp_text);
   // Save json response to "leetcode_problems.json"
@@ -108,25 +98,79 @@ fn download_questions_data() {
 /*
 GetProblemDetailByFrontendId calls Leetcode GraphQL API https://leetcode.com/graphql to get problem detail by title slug
 */
+fn query_question_data(title_slug: &str) -> String {
+  let payload = format!(
+    r#"{{
+		"operationName": "questionData",
+		"variables": {{
+			"titleSlug": "{}"
+		}},
+		"query": "query questionData($titleSlug: String!) {{
+      question(titleSlug: $titleSlug) {{
+        questionId  
+        questionFrontendId 
+        title 
+        titleSlug 
+        difficulty 
+        content 
+        codeSnippets{{      
+          lang      
+          langSlug   
+          code   
+        }}
+      }}
+    }}"
+	}}"#,
+    title_slug
+  );
+  println!("----payload    {:#?}", payload);  
+  let client = reqwest::blocking::Client::new();
+
+  let res = client
+    .post(LEETCODE_GRPAHQL_API_URL)
+    .body(payload)
+    .send().unwrap();
+  
+    println!("----res    {:#?}", res);  
+  //res
+  "".to_string()
+}
 
 fn generate_solution(config: &Config, id: &str) {
   // find detail in the json file_name
   let json_file = std::fs::File::open("leetcode_problems.json").expect("read file error!");
   let leetcode: entities::Leetcode = serde_json::from_reader(json_file).unwrap();
   let front_id: u32 = id.parse().unwrap();
-  let target = leetcode
+  let state_status_pair = leetcode
     .stat_status_pairs
     .iter()
-    .find(|x| x.stat.frontend_question_id == front_id);
+    .find(|x| x.stat.frontend_question_id == front_id)
+    .unwrap();
 
-  match target {
-    Some(state_status_pair) => {
-      let question_title = &state_status_pair.stat.question__title;
-      let question_title_slug = &state_status_pair.stat.question__title_slug;
-      let question_difficulty = entities::Level::from_u32(state_status_pair.difficulty.level);
+  let question_title = &state_status_pair.stat.question__title;
+  let question_title_slug = &state_status_pair.stat.question__title_slug;
+  let question_difficulty = entities::Level::from_u32(state_status_pair.difficulty.level);
+  // query code snippet  >>> CSRF verification failed
+  // let response = query_question_data(&question_title_slug);
+  // let data: entities::QuesitonData = serde_json::from_str(&response).unwrap();  
+  // let code_snippet = data
+  //   .question
+  //   .code_snippets
+  //   .iter()
+  //   .find(|x| x.lanSlug == "rust")
+  //   .unwrap();
+  let code_snippet = r#"
+impl Solution {
+  pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+    
+    
+  }
+}
+  "#;
 
-      let file_header = format!(
-        r#"/*
+
+  let file_header = format!(
+    r#"/*
   {}. {}
 
   https://leetcode.com/problems/{}/
@@ -135,25 +179,32 @@ fn generate_solution(config: &Config, id: &str) {
 */
 pub struct Solution;
 
-impl Solution {{
-  pub fn implementation() {{
+{}"#,
+    id, question_title, question_title_slug, question_difficulty, code_snippet
+  );
+  let full_path = format!(
+    "{}/_{:0>4}_{}.rs",
+    &config.output_folder,
+    id,
+    question_title_slug.replace("-", "_")
+  );
+  println!("full_path: {}", full_path);
+  let mut f = File::create(full_path).unwrap();
+  f.write_all(file_header.as_bytes()).unwrap();
+}
 
-  }}
-}}"#,
-        id, question_title, question_title_slug, question_difficulty
-      );
-      let full_path = format!(
-        "{}/_{:0>4}_{}.rs",
-        &config.output_folder,
-        id,
-        question_title_slug.replace("-", "_")
-      );
-      //println!("{}", full_path);
-      let mut f = File::create(full_path).unwrap();
-      f.write_all(file_header.as_bytes()).unwrap();
-    }
-    None => {
-      println!("Can not find problem #{}", id);
-    }
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_query_question_data() {
+    let data = query_question_data("best-time-to-buy-and-sell-stock");
+    println!("Question Data: {}", data)
+  }
+
+  #[test]
+  fn test_bad() {
+    assert_eq!(bad_add(1, 2), 3);
   }
 }

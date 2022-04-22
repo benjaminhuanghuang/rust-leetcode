@@ -54,4 +54,21 @@ impl fmt::Display for Level {
       }
   }
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct QuesitonData {
+  pub question:Question
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Question {
+  pub code_snippets:Vec<CodeSnippet>
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CodeSnippet {
+  pub code: String,
+  pub lang: String,
+  pub lanSlug: String,
+}
 // endregion: leetcode json
