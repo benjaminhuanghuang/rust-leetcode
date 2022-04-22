@@ -161,15 +161,26 @@ fn generate_solution(config: &Config, id: &str) {
   //   .unwrap();
   let code_snippet = r#"
 impl Solution {
-  pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+  pub fn do_something(nums: Vec<i32>, target: i32) -> Vec<i32> {
     
     
   }
 }
   "#;
 
+  let test_code_snippet = r#"
+#[cfg(test)]
+mod tests {
+  use super::*;
 
-  let file_header = format!(
+  #[test]
+  fn test_success() {
+    assert_eq!(Solution::do_something(), vec![0]);
+  }
+} 
+  "#;
+
+  let solution_content = format!(
     r#"/*
   {}. {}
 
@@ -178,19 +189,21 @@ impl Solution {
   {}
 */
 pub struct Solution;
-
-{}"#,
-    id, question_title, question_title_slug, question_difficulty, code_snippet
+{}
+{}
+"#,
+    id, question_title, question_title_slug, question_difficulty, code_snippet, test_code_snippet
   );
+
   let full_path = format!(
     "{}/_{:0>4}_{}.rs",
     &config.output_folder,
     id,
     question_title_slug.replace("-", "_")
   );
-  println!("full_path: {}", full_path);
+  //println!("full_path: {}", full_path);
   let mut f = File::create(full_path).unwrap();
-  f.write_all(file_header.as_bytes()).unwrap();
+  f.write_all(solution_content.as_bytes()).unwrap();
 }
 
 #[cfg(test)]
