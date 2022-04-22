@@ -26,5 +26,25 @@ pub fn to_list(vec: Vec<i32>) -> List {
 }
 
 pub fn list_equal(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> bool {
-  true
+  let mut l1 = l1;
+  let mut l2 = l2;
+  while l1.is_some() && l2.is_some() {
+    let node1 = l1.unwrap();
+    let node2 = l2.unwrap();
+    if node1.val != node2.val { return false; }
+
+    l1 = node1.next;
+    l2 = node2.next;
+  }
+
+  l1.is_none() && l1.is_none()
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  #[test]
+  fn test_list_equal() {
+    assert!(list_equal(to_list(vec![3, 2, 1]), to_list(vec![3, 2, 1])));
+  }
 }

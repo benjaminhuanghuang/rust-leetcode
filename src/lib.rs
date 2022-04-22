@@ -5,3 +5,5 @@ pub mod _0003_longest_substring_without_repeating_characters;
 pub mod _0121_best_time_to_buy_and_sell_stock;
 
 pub mod _0206_reverse_linked_list;
+pub mod _0234_palindrome_linked_list;
+
