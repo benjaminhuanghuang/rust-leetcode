@@ -45,19 +45,8 @@ impl Solution {
 #[cfg(test)]
 mod tests {
   use super::*;
-
-  type List = Option<Box<ListNode>>;
-
-  pub fn to_list(vec: Vec<i32>) -> List {
-    let mut current = None;
-    for &v in vec.iter().rev() {
-      let mut node = ListNode::new(v);
-      node.next = current;
-      current = Some(Box::new(node));
-    }
-    current
-  }
-
+  use super::super::data_structure::list_node::to_list;
+  
   #[test]
   fn test_add_two_numbers_success() {
     assert_eq!(

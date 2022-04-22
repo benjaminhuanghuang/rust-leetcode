@@ -9,3 +9,18 @@
     p = p.as_ref().unwrap().next;
   }
 ```
+
+
+## while loop
+```
+  let mut head = head;
+  let mut reversed = None;
+
+  while let Some(mut node) = head {
+    head = node.next;
+    node.next = reversed;
+    reversed = Some(node);
+  }
+
+  reversed
+```
