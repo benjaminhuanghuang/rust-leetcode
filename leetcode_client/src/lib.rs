@@ -219,6 +219,7 @@ pub struct Solution;
   add_mod(&mod_line);
 }
 
+// append the new solution to lib.rs
 fn add_mod(mod_line: &str) {
   let mut file = OpenOptions::new()
     .write(true)
