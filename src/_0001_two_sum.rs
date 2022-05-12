@@ -16,7 +16,7 @@ impl Solution {
     let mut hash = HashMap::new();
 
     for (i, num) in nums.iter().enumerate() {
-      let complement = target - *num;
+      let complement = target - num;
       if hash.contains_key(&complement) {
         return vec![hash[&complement], i as i32];
       }

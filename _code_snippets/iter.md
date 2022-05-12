@@ -1,3 +1,6 @@
+## Sample
+- 1. Two Sum
+- 1018. Binary Prefix Divisible By 5
 
 
 ## Iter of vec
@@ -16,6 +19,18 @@ Index and value
 
 Value
 ```
-for price in prices.iter {
+let v=vec![1,2,3,4,5];
+
+for i in v.iter {
 }
+```
+## For each
+```
+items.iter().enumerate().for_each(|(i, x)| {
+    println!("Item {} = {}", i, x);
+})
+```
+
+## filter
+```
 ```
