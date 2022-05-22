@@ -24,3 +24,10 @@
 
   reversed
 ```
+
+## next
+```
+*cur = Some(Box::new(ListNode::new(sum % 10)));
+cur = &mut cur.as_mut().unwrap().next;
+
+```

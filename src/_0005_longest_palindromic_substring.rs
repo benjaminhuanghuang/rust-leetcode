@@ -32,19 +32,20 @@ Space complexity: O(1)
 use std::cmp;
 
 impl Solution {
-  pub fn get_len(chars: &Vec<char>, mut l: usize, mut r: usize) -> usize {
+  pub fn get_len(chars: &Vec<char>, left: usize, right: usize) -> usize {
+    
+    // Bad thing: if i use l with usize, when l is 0, l-1 will be 18446744073709551615 
+    let (mut l, mut r) = (left as i32, right as i32);
     // can not use l >=0 for usize type
-    while l != std::usize::MAX && r < chars.len() && chars[l] == chars[r] {
-      // l -= 1;  DOES not work
-      // l = ((l as isize)-1) as usize;
-      l = l.checked_sub(1).unwrap_or(chars.len());  
+    let len = chars.len() as i32;    
+    while  l>=0  && r < len && chars[l as usize] == chars[r as usize] {
+      l -= 1;
       r += 1;
     }
-    //
-    // ((r as isize - l as isize) - 1) as usize
-    r.checked_sub(l).unwrap_or(chars.len()) - 1
+    (r-l - 1) as usize
   }
 
+  
   pub fn longest_palindrome(s: String) -> String {
     let mut max_len = 0;
     let mut start = 0;

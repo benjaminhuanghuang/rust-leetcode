@@ -7,7 +7,7 @@
   }
 ```
 
-## to access char by index
+## sting to vector and access char by index
 ```
   let s: Vec<char> = sv.chars().collect();
 ```
