@@ -33,19 +33,17 @@ use std::cmp;
 
 impl Solution {
   pub fn get_len(chars: &Vec<char>, left: usize, right: usize) -> usize {
-    
-    // Bad thing: if i use l with usize, when l is 0, l-1 will be 18446744073709551615 
+    // Bad thing: if i use l with usize, when l is 0, l-1 will be 18446744073709551615
     let (mut l, mut r) = (left as i32, right as i32);
     // can not use l >=0 for usize type
-    let len = chars.len() as i32;    
-    while  l>=0  && r < len && chars[l as usize] == chars[r as usize] {
+    let len = chars.len() as i32;
+    while l >= 0 && r < len && chars[l as usize] == chars[r as usize] {
       l -= 1;
       r += 1;
     }
-    (r-l - 1) as usize
+    (r - l - 1) as usize
   }
 
-  
   pub fn longest_palindrome(s: String) -> String {
     let mut max_len = 0;
     let mut start = 0;
