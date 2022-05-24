@@ -1,3 +1,13 @@
+```
+  for (i, num) in nums.iter().enumerate() {
+    let complement = target - num;
+    if hash.contains_key(&complement) {
+      return vec![hash[&complement], i as i32];
+    }
+    hash.insert(num, i as i32);
+  }
+
+```
 
 ```
   let mut hash: HashMap<i32, usize> = HashMap::new();
@@ -9,6 +19,4 @@
     }
     hash.insert(*num, i);
   }
-
-  vec![]
 ```

@@ -1,3 +1,7 @@
+## Trim
+```
+ for c in str.trim_start().chars() {
+```   
 
 
 ## for chars in string
