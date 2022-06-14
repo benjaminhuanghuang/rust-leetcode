@@ -13,4 +13,4 @@ pub mod _0206_reverse_linked_list;
 pub mod _0234_palindrome_linked_list;
 pub mod _1018_binary_prefix_divisible_by_5;
 pub mod _1290_convert_binary_number_in_a_linked_list_to_integer;
-pub mod _0021_merge_two_sorted_lists;
+pub mod _0021_merge_two_sorted_lists;pub mod _0876_middle_of_the_linked_list;
