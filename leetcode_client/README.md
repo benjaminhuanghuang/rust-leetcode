@@ -1,5 +1,10 @@
 # Generate solution file for leetcode problem
 
+## Usage
+```
+  cargo run -- <problem-id>
+```
+
 1. get all leetcode problems and save them in json file
 ```
 reqwest::get(LEETCODE_PROBLEMS_API_URL)
