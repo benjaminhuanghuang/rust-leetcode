@@ -35,6 +35,6 @@ mod tests {
 
   #[test]
   fn test_success() {
-    assert_eq!(Solution::middle_node(None), None);
+    assert_eq!(Solution::middle_node_slow(None), None);
   }
 }
