@@ -38,7 +38,7 @@ pub fn get_args() -> MyResult<Config> {
   let matches = Command::new("LeetcodeClient")
     .version("0.1.0")
     .author("Benjamin <benjamin@gmail.com>")
-    .about("Rust Leetcode client")
+    .about("Rust Leetcode fetcher")
     .arg(
       Arg::new("ids")
         .value_name("IDS")
