@@ -64,7 +64,7 @@ pub fn run(config: Config) -> MyResult<()> {
       continue;
     }
     let code = code.unwrap();
-    deal_problem(&problem, &code, true);
+    generate_solution_file(&problem, &code, true);
   }
   Ok(())
 }
@@ -117,7 +117,7 @@ pub fn get_problem(frontend_question_id: &u32, problems: &Problems) -> Option<Pr
 /*
   Generate the files for solution
 */
-fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) {
+fn generate_solution_file(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) {
   let file_name = format!(
     "_{:04}_{}",
     problem.question_id,
