@@ -1,6 +1,6 @@
 //use leetcode::_0001_two_sum::Solution;
 use leetcode::_0004_median_of_two_sorted_arrays::Solution;
-use leetcode::data_structure::list_node::*;
+use leetcode::util::list_node::*;
 
 fn main() {
   println!(

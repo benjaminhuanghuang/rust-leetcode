@@ -5,8 +5,9 @@
 
     __PROBLEM_DIFFICULTY__
 */
-pub struct Solution {}__EXTRA_USE__
+__EXTRA_USE__
 
+pub struct Solution;
 
 __PROBLEM_DEFAULT_CODE__
 

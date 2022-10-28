@@ -1,10 +1,11 @@
 ## Fetch the problem
 - my_fetcher
 ```
-    cargo run -- 111 222 333 
+    cargo run -- {id1 id2 id3} 
 ```
 ## Run the test
 ```
+    cargo test test_{id}
 ```
 
 

@@ -21,6 +21,8 @@ const PROBLEMS_URL: &str = "https://leetcode.com/api/problems/algorithms/";
 
 const GRAPHQL_URL: &str = "https://leetcode.com/graphql";
 
+const TARGET_DIR: &str = "../src";
+
 // --------------------------------------------------
 pub fn get_args() -> MyResult<Config> {
   let matches = Command::new("Leetcode Fetcher")
@@ -121,7 +123,7 @@ fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) 
     problem.question_id,
     problem.title_slug.replace("-", "_")
   );
-  let file_path = Path::new("./problem").join(format!("{}.rs", file_name));
+  let file_path = Path::new(TARGET_DIR).join(format!("{}.rs", file_name));
   if file_path.exists() {
     panic!("problem already initialized");
   }
@@ -130,10 +132,7 @@ fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) 
   let source = template
     .replace("__PROBLEM_TITLE__", &problem.title)
     .replace("__PROBLEM_LINK__", &parse_problem_link(problem))
-    .replace(
-      "__PROBLEM_DIFFICULTY__",
-      &insert_return_in_code(&problem.return_type, &problem.difficulty),
-    )
+    .replace("__PROBLEM_DIFFICULTY__", &problem.difficulty)
     .replace(
       "__PROBLEM_DEFAULT_CODE__",
       &insert_return_in_code(&problem.return_type, &code.default_code),
@@ -155,9 +154,9 @@ fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) 
     let mut lib_file = fs::OpenOptions::new()
       .write(true)
       .append(true)
-      .open("./mod.rs")
+      .open(format!("{}/lib.rs", TARGET_DIR))
       .unwrap();
-    writeln!(lib_file, "mod {};", file_name);
+    writeln!(lib_file, "pub mod {};", file_name);
   }
 }
 
@@ -165,14 +164,14 @@ fn parse_extra_use(code: &str) -> String {
   let mut extra_use_line = String::new();
   // a linked-list problem
   if code.contains("pub struct ListNode") {
-    extra_use_line.push_str("\nuse crate::util::linked_list::{ListNode, to_list};")
+    extra_use_line.push_str("\nuse super::util::list_node::ListNode;")
   }
   if code.contains("pub struct TreeNode") {
-    extra_use_line.push_str("\nuse crate::util::tree::{TreeNode, to_tree};")
+    extra_use_line.push_str("\nuse super::util::tree_node::TreeNode;")
   }
-  if code.contains("pub struct Point") {
-    extra_use_line.push_str("\nuse crate::util::point::Point;")
-  }
+  // if code.contains("pub struct Point") {
+  //   extra_use_line.push_str("\nuse super::util::point::Point;")
+  // }
   extra_use_line
 }
 

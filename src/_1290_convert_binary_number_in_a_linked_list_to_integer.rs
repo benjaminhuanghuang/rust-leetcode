@@ -5,7 +5,7 @@
 
   Easy
 */
-use super::data_structure::list_node::ListNode;
+use super::util::list_node::ListNode;
 
 pub struct Solution;
 
