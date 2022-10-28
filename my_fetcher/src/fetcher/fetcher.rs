@@ -1,21 +1,15 @@
-mod entities;
-
-use crate::entities::{CodeDefinition, Problem, Problems, Query, RawProblem, Value};
+use super::entities::{CodeDefinition, Problem, Problems, Query, RawProblem};
 
 use clap::{Arg, Command};
-// use serde_json::Value;
-use std::error::Error;
-// use std::fmt::{Display, Formatter};
-use std::fs;
 
-use crate::entities::{get_args, run};
-use std::env;
-use std::fs::File;
-use std::io;
-use std::io::{BufRead, Write};
+use std::error::Error;
+use std::fs;
+use std::io::Write;
 use std::path::Path;
 
 use regex::Regex;
+
+use serde_json::Value;
 
 #[derive(Debug)]
 pub struct Config {
@@ -26,19 +20,6 @@ type MyResult<T> = Result<T, Box<dyn Error>>;
 const PROBLEMS_URL: &str = "https://leetcode.com/api/problems/algorithms/";
 
 const GRAPHQL_URL: &str = "https://leetcode.com/graphql";
-
-const QUESTION_QUERY_STRING: &str = r#"
-query questionData($titleSlug: String!) {
-    question(titleSlug: $titleSlug) {
-        content
-        stats
-        codeDefinition
-        sampleTestCase
-        metaData
-    }
-}"#;
-
-const QUESTION_QUERY_OPERATION: &str = "questionData";
 
 // --------------------------------------------------
 pub fn get_args() -> MyResult<Config> {
@@ -64,7 +45,7 @@ pub fn run(config: Config) -> MyResult<()> {
   for id in config.question_ids.iter() {
     //generate_solution(&config, &id);
     println!("Fetch problem {}", id);
-    let problem = get_problem(id, problems).unwrap_or_else(|| {
+    let problem = get_problem(id, &problems).unwrap_or_else(|| {
       panic!(
         "Error: failed to get problem #{} \
            (The problem may be paid-only or may not be exist).",
@@ -96,9 +77,9 @@ fn get_problems() -> Option<Problems> {
 /*
 
 */
-pub fn get_problem(frontend_question_id: &u32, problems: Problems) -> Option<Problem> {
+pub fn get_problem(frontend_question_id: &u32, problems: &Problems) -> Option<Problem> {
   for problem in problems.stat_status_pairs.iter() {
-    if problem.stat.frontend_question_id == frontend_question_id {
+    if problem.stat.frontend_question_id == *frontend_question_id {
       if problem.paid_only {
         return None;
       }

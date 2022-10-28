@@ -1,5 +1,6 @@
+use core::fmt::{Display, Error, Formatter};
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use serde_json::json;
 
 #[derive(Serialize, Deserialize)]
 pub struct Problem {
@@ -24,15 +25,27 @@ pub struct CodeDefinition {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Query {
+pub struct Query {
   #[serde(rename = "operationName")]
   operation_name: String,
   variables: serde_json::Value,
   query: String,
 }
 
+const QUESTION_QUERY_OPERATION: &str = "questionData";
+const QUESTION_QUERY_STRING: &str = r#"
+query questionData($titleSlug: String!) {
+    question(titleSlug: $titleSlug) {
+        content
+        stats
+        codeDefinition
+        sampleTestCase
+        metaData
+    }
+}"#;
+
 impl Query {
-  fn question_query(title_slug: &str) -> Query {
+  pub fn question_query(title_slug: &str) -> Query {
     Query {
       operation_name: QUESTION_QUERY_OPERATION.to_owned(),
       variables: json!({ "titleSlug": title_slug }),
@@ -42,25 +55,25 @@ impl Query {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct RawProblem {
-  data: Data,
+pub struct RawProblem {
+  pub data: Data,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Data {
-  question: Question,
+pub struct Data {
+  pub question: Question,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Question {
-  content: String,
+pub struct Question {
+  pub content: String,
   stats: String,
   #[serde(rename = "codeDefinition")]
-  code_definition: String,
+  pub code_definition: String,
   #[serde(rename = "sampleTestCase")]
-  sample_test_case: String,
+  pub sample_test_case: String,
   #[serde(rename = "metaData")]
-  meta_data: String,
+  pub meta_data: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -77,8 +90,8 @@ pub struct Problems {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StatWithStatus {
   pub stat: Stat,
-  difficulty: Difficulty,
-  paid_only: bool,
+  pub difficulty: Difficulty,
+  pub paid_only: bool,
   is_favor: bool,
   frequency: u32,
   progress: u32,
@@ -90,9 +103,9 @@ pub struct Stat {
   #[serde(rename = "question__article__slug")]
   question_article_slug: Option<String>,
   #[serde(rename = "question__title")]
-  question_title: Option<String>,
+  pub question_title: Option<String>,
   #[serde(rename = "question__title_slug")]
-  question_title_slug: Option<String>,
+  pub question_title_slug: Option<String>,
   #[serde(rename = "question__hide")]
   question_hide: bool,
   total_acs: u32,
@@ -102,7 +115,7 @@ pub struct Stat {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Difficulty {
+pub struct Difficulty {
   level: u32,
 }
 
