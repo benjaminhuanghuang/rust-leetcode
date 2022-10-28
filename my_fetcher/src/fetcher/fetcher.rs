@@ -164,10 +164,10 @@ fn parse_extra_use(code: &str) -> String {
   let mut extra_use_line = String::new();
   // a linked-list problem
   if code.contains("pub struct ListNode") {
-    extra_use_line.push_str("\nuse super::util::list_node::ListNode;")
+    extra_use_line.push_str("\nuse super::util::list_node::{to_list, ListNode};")
   }
   if code.contains("pub struct TreeNode") {
-    extra_use_line.push_str("\nuse super::util::tree_node::TreeNode;")
+    extra_use_line.push_str("\nuse super::util::tree_node::{to_tree, TreeNode};")
   }
   // if code.contains("pub struct Point") {
   //   extra_use_line.push_str("\nuse super::util::point::Point;")

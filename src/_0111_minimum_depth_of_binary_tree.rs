@@ -6,7 +6,7 @@
     Easy
 */
 
-use super::util::tree_node::TreeNode;
+use super::util::tree_node::{to_tree, TreeNode};
 
 pub struct Solution;
 
@@ -57,6 +57,7 @@ impl Solution {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use crate::tree;
 
   #[test]
   fn test_111() {
