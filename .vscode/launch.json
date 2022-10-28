@@ -2,14 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "lldb",
+      "type": "cppvsdbg",
       "request": "launch",
-      "name": "Cargo test",
-      "cargo": {
-        "args": ["test", "--no-run", "--lib"]
-      },
-      "program": "${cargo:program}",
-      "args": []
+      "name": "(Windows)my fetcher",
+      "program": "${workspaceRoot}/my_fetcher/target/debug/my_fetcher.exe",
+      "args": ["--", "111"],
+      "cwd": "${workspaceFolder}/my_fetcher",
     },
     {
       "type": "lldb",

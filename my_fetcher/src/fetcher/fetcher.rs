@@ -117,7 +117,7 @@ pub fn get_problem(frontend_question_id: &u32, problems: &Problems) -> Option<Pr
 */
 fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) {
   let file_name = format!(
-    "p{:04}_{}",
+    "_{:04}_{}",
     problem.question_id,
     problem.title_slug.replace("-", "_")
   );
@@ -129,15 +129,17 @@ fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) 
   let template = fs::read_to_string("./template.txt").unwrap();
   let source = template
     .replace("__PROBLEM_TITLE__", &problem.title)
-    .replace("__PROBLEM_DESC__", &build_desc(&problem.content))
+    .replace("__PROBLEM_LINK__", &parse_problem_link(problem))
+    .replace(
+      "__PROBLEM_DIFFICULTY__",
+      &insert_return_in_code(&problem.return_type, &problem.difficulty),
+    )
     .replace(
       "__PROBLEM_DEFAULT_CODE__",
       &insert_return_in_code(&problem.return_type, &code.default_code),
     )
     .replace("__PROBLEM_ID__", &format!("{}", problem.question_id))
-    .replace("__EXTRA_USE__", &parse_extra_use(&code.default_code))
-    .replace("__PROBLEM_LINK__", &parse_problem_link(problem))
-    .replace("__DISCUSS_LINK__", &parse_discuss_link(problem));
+    .replace("__EXTRA_USE__", &parse_extra_use(&code.default_code));
 
   let mut file = fs::OpenOptions::new()
     .write(true)
