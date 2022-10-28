@@ -6,7 +6,7 @@
   Easy
 */
 
-use super::util::list_node::ListNode;
+use crate::util::list_node::ListNode;
 pub struct Solution;
 impl Solution {
   pub fn merge_two_lists(

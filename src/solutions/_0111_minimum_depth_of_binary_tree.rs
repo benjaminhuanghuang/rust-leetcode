@@ -6,7 +6,7 @@
     Easy
 */
 
-use super::util::tree_node::{to_tree, TreeNode};
+use crate::util::tree_node::{to_tree, TreeNode};
 
 pub struct Solution;
 

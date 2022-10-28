@@ -21,7 +21,7 @@ const PROBLEMS_URL: &str = "https://leetcode.com/api/problems/algorithms/";
 
 const GRAPHQL_URL: &str = "https://leetcode.com/graphql";
 
-const TARGET_DIR: &str = "../src";
+const TARGET_DIR: &str = "../src/solutions";
 
 // --------------------------------------------------
 pub fn get_args() -> MyResult<Config> {
@@ -154,7 +154,7 @@ fn deal_problem(problem: &Problem, code: &CodeDefinition, write_mod_file: bool) 
     let mut lib_file = fs::OpenOptions::new()
       .write(true)
       .append(true)
-      .open(format!("{}/lib.rs", TARGET_DIR))
+      .open(format!("{}/mod.rs", TARGET_DIR))
       .unwrap();
     writeln!(lib_file, "pub mod {};", file_name);
   }
@@ -164,10 +164,10 @@ fn parse_extra_use(code: &str) -> String {
   let mut extra_use_line = String::new();
   // a linked-list problem
   if code.contains("pub struct ListNode") {
-    extra_use_line.push_str("\nuse super::util::list_node::{to_list, ListNode};")
+    extra_use_line.push_str("\nuse crate::util::list_node::{to_list, ListNode};")
   }
   if code.contains("pub struct TreeNode") {
-    extra_use_line.push_str("\nuse super::util::tree_node::{to_tree, TreeNode};")
+    extra_use_line.push_str("\nuse crate::util::tree_node::{to_tree, TreeNode};")
   }
   // if code.contains("pub struct Point") {
   //   extra_use_line.push_str("\nuse super::util::point::Point;")

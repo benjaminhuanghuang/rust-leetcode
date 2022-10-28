@@ -57,17 +57,12 @@ mod tests {
   use super::*;
 
   #[test]
-  fn test_success() {
+  fn test_1() {
     assert_eq!(Solution::two_sum(vec![2, 7, 11, 15], 9), vec![0, 1]);
-  }
 
-  #[test]
-  fn test_2_success() {
     assert_eq!(Solution::two_sum_2(vec![2, 7, 11, 15], 9), vec![0, 1]);
-  }
 
-  #[test]
-  fn test_naive_success() {
+    // test_naive_success
     assert_eq!(Solution::two_sum_naive(vec![2, 7, 11, 15], 9), vec![0, 1]);
   }
 }

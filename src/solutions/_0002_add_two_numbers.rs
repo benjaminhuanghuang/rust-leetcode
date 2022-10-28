@@ -6,7 +6,7 @@
   Medium
 */
 
-use super::util::list_node::ListNode;
+use crate::util::list_node::ListNode;
 
 pub struct Solution;
 
@@ -43,8 +43,8 @@ impl Solution {
 
 #[cfg(test)]
 mod tests {
-  use super::super::util::list_node::to_list;
   use super::*;
+  use crate::util::list_node::to_list;
 
   #[test]
   fn test_add_two_numbers_success() {
