@@ -8,6 +8,7 @@
 
 use crate::util::list_node::ListNode;
 pub struct Solution;
+
 impl Solution {
   pub fn merge_two_lists(
     list1: Option<Box<ListNode>>,
