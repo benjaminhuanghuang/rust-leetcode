@@ -23,3 +23,10 @@ skip()
   
   }
 ```
+
+## For each
+```
+  items.iter().enumerate().for_each(|(i, x)| {
+      println!("Item {} = {}", i, x);
+  })
+```
