@@ -30,7 +30,7 @@ mod tests {
   use crate::util::list_node::to_list;
 
   #[test]
-  fn test_success() {
+  fn test_206() {
     assert_eq!(
       Solution::reverse_list(to_list(vec![1, 2, 3])),
       to_list(vec![3, 2, 1])
