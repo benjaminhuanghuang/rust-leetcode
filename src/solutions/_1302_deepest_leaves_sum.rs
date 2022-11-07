@@ -11,11 +11,47 @@ use crate::util::tree_node::TreeNode;
 pub struct Solution;
 
 use std::cell::RefCell;
+use std::cmp::Ordering;
 use std::rc::Rc;
 
 /*
   dfs(root, curr_level)
 */
+pub struct Solution2;
+
+static mut MAX_VAL: i32 = 0;
+static mut MAX_LEVEL: i32 = 0;
+
+impl Solution2 {
+  pub fn deepest_leaves_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    unsafe {
+      // the life time of static value is application level.
+      // reset value to 0 for tests
+      MAX_LEVEL = 0;
+      MAX_VAL = 0;
+      dfs(root, 0);
+      MAX_VAL
+    }
+  }
+}
+unsafe fn dfs(r: Option<Rc<RefCell<TreeNode>>>, level: i32) {
+  if let Some(r) = r {
+    let mut r = r.borrow_mut();
+    if r.left == None && r.right == None {
+      match level.cmp(&MAX_LEVEL) {
+        Ordering::Less => {}
+        Ordering::Equal => MAX_VAL += r.val,
+        Ordering::Greater => {
+          MAX_VAL = r.val;
+          MAX_LEVEL = level;
+        }
+      }
+    }
+
+    dfs(r.left.take(), level + 1);
+    dfs(r.right.take(), level + 1);
+  }
+}
 impl Solution {
   pub fn deepest_leaves_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
     let maxdepth = 0_usize;
