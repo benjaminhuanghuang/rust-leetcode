@@ -11,6 +11,13 @@
 
 
 ## loop
+Use *
+```
+  for price in prices.iter() {
+      if *price < lowest_price 
+  }
+```
+
 ```
   for (i, v) in nums.iter().enumerate() {
     
