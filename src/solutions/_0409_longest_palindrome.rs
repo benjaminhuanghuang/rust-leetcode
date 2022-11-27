@@ -5,9 +5,6 @@
 
     Easy
 */
-
-use std::mem::Discriminant;
-
 pub struct Solution;
 /*
   Solution:
