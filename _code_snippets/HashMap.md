@@ -32,7 +32,13 @@ Use HashMap.get()
   
 ```
 
-
+## count chars in a string
+```
+  let mut hm = HashMap::new();
+  for ch in s.chars() {
+    *hm.entry(ch).or_insert(0) += 1;
+  }
+```
 
 
 ```
