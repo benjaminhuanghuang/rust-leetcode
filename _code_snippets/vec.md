@@ -13,6 +13,13 @@
 
 
 ## loop
+Use index
+```
+for i in 0..nums.len() {
+  
+}
+```
+
 Use *
 ```
   for price in prices.iter() {
