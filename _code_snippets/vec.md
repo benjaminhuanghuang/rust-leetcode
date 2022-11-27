@@ -3,6 +3,8 @@
 ## Create N elements in vector
 ```
   let mut result = vec![String::new(); num_rows];
+
+  let mut result = Vec::with_capacity(nums.len());
 ```
 
 ```
@@ -36,4 +38,18 @@ skip()
   items.iter().enumerate().for_each(|(i, x)| {
       println!("Item {} = {}", i, x);
   })
+```
+
+## iterator to vec
+```
+  let mut result: HashSet<i32> = HashSet::new();
+
+  for i in nums {
+    let v = hm.entry(i).or_insert(0);
+    *v += 1;
+    if *v > 1 {
+      result.insert(i);
+    }
+  }
+  result.into_iter().collect()
 ```

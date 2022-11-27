@@ -17,3 +17,4 @@ pub mod _1018_binary_prefix_divisible_by_5;
 pub mod _1290_convert_binary_number_in_a_linked_list_to_integer;
 pub mod _1302_deepest_leaves_sum;
 pub mod _0409_longest_palindrome;
+pub mod _0442_find_all_duplicates_in_an_array;

@@ -1,6 +1,8 @@
 ## Create
 ```
-  let mut hash: HashMap<i32, usize> = HashMap::new();
+  use std::collections::HashMap;
+
+  let mut hm: HashMap<i32, i32> = HashMap::new();
 ```
 
 
