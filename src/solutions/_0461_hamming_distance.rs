@@ -9,6 +9,9 @@
 pub struct Solution;
 
 impl Solution {
+  /*
+  对于二进制串ａ和ｂ来说，汉明距离等于ａ xor ｂ中１的数目
+  */
   pub fn hamming_distance(x: i32, y: i32) -> i32 {
     (x ^ y).count_ones() as i32
   }
@@ -34,6 +37,7 @@ impl Solution {
   }
 
   /*
+    Hamming Distance between two string
     https://www.youtube.com/watch?v=2t6bgm7gUoQ&t=58s
   */
   pub fn hamming_distance_str(s1: &str, s2: &str) -> Option<usize> {
