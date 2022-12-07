@@ -6,30 +6,37 @@
     Medium
 
 
-    If the number of keys exceeds the capacity from this operation, `evict` the least recently used key.
-    清除最近最少使用的key
-
-    The functions get and put must each run in O(1) average time complexity.
+    * If the number of keys exceeds the capacity from this operation, `evict` the least recently used key.
+    * The functions get and put must each run in O(1) average time complexity.
 */
 
 /*
     Least Recently Used, 最近最少使用, 关键在于追踪每一个 entry 的 age, 每次淘汰最旧的那一个 key
+    用一个链表记录node被访问的顺序，最新被访问的node放在tail，
 
-    假如淘汰逻辑要做到 O(1) 复杂度, 需要引入一个链表 with head and tail, 每次 access 一个key时, 就delete它重新 push_back,
-    而当达到容量要驱逐时, 则 pop_front
+    None <--- node <---> node <---> node <---> node <---> node ---> None
+             key         key        key        key        key
+            value       value      value      value      value
+               ^           ^          ^          ^          ^
+               |           |          |          |          |
+               |           |          |          |          |
+     map:     key         key        key        key        key
 
-    Rust 的链表不支持根据引用删除任意元素，也没有 LinkedHashMap，需要自己实现一个
+    get(key): delete entry and push_back to the linked list,
+    put(key, value):
+        If key exist, delete entry and push_back to the linked list,,
+        If not
+            If reach capacity, push_back,
+            else capacity, pop_front, push_back,
 */
-use std::collections::HashMap;
-use std::mem;
-use std::ptr;
+use std::{borrow::Borrow, collections::HashMap};
 
 // Entry is either a map entry and a link-list node
 pub struct LRUEntry {
   key: i32,
   val: i32,
-  prev: *mut LRUEntry,
-  next: *mut LRUEntry,
+  prev: Option<Box<LRUEntry>>,
+  next: Option<Box<LRUEntry>>,
 }
 
 impl LRUEntry {
@@ -37,119 +44,125 @@ impl LRUEntry {
     LRUEntry {
       key: key,
       val: val,
-      prev: ptr::null_mut(),
-      next: ptr::null_mut(),
+      prev: None,
+      next: None,
     }
   }
 }
 
 pub struct LRUCache {
+  capacity: usize,
+  length: usize,
   map: HashMap<i32, Box<LRUEntry>>,
-  cap: usize,
-
-  // head and tail is dummy node of the double-linked-list
-  head: *mut LRUEntry,
-  tail: *mut LRUEntry,
+  head: Option<Box<LRUEntry>>,
+  tail: Option<Box<LRUEntry>>,
 }
 
 impl LRUCache {
   pub fn new(capacity: i32) -> Self {
-    let capacity = capacity as usize;
-    let map = HashMap::with_capacity(capacity);
-    let cache = LRUCache {
-      map: map,
-      cap: capacity,
-      head: unsafe { Box::into_raw(Box::new(mem::uninitialized::<LRUEntry>())) },
-      tail: unsafe { Box::into_raw(Box::new(mem::uninitialized::<LRUEntry>())) },
-    };
-    unsafe {
-      (*cache.head).next = cache.tail;
-      (*cache.tail).prev = cache.head;
+    let cap = capacity as usize;
+    Self {
+      map: HashMap::with_capacity(cap),
+      length: 0,
+      capacity: cap,
+      head: None,
+      tail: None,
     }
-
-    cache
   }
 
   pub fn get(&mut self, key: i32) -> i32 {
-    let (ptr, val) = match self.map.get_mut(&key) {
-      None => (None, None),
-      Some(entry) => {
-        let ptr: *mut LRUEntry = &mut **entry;
-        (Some(ptr), Some(unsafe { (*entry).val }))
-      }
-    };
-
-    if let Some(ptr) = ptr {
-      self.detach(ptr);
-      self.push(ptr);
+    if let Some(entry) = self.map.get(&key) {
+      self.remove(entry);
+      self.insert(entry.key, entry.val);
+      return entry.val;
     }
-    val.unwrap_or(-1)
+    -1
   }
 
   pub fn put(&mut self, key: i32, value: i32) {
-    let ptr = self.map.get_mut(&key).map(|entry| {
-      let ptr: *mut LRUEntry = &mut **entry;
-      ptr
-    });
-
-    match ptr {
-      Some(ptr) => {
-        // key already exist, update it
-        unsafe { (*ptr).val = value };
-        self.detach(ptr);
-        self.push(ptr);
+    match self.map.get(&key) {
+      // key existed
+      Some(entry) => {
+        self.remove(entry);
+        self.insert(key, value);
       }
+      // new key
       None => {
-        // insert new key, cache is full, evict
-        if self.map.len() == self.cap {
-          let mut old_entry = self.pop().unwrap();
-          old_entry.key = key;
-          old_entry.val = value;
-          self.push(&mut *old_entry);
-          self.map.insert(key, old_entry);
+        if self.length >= self.capacity {
+          self.remove(self.head);
+          self.insert(key, value);
         } else {
-          let mut new_entry = Box::new(LRUEntry::new(key, value));
-          self.push(&mut *new_entry);
-          self.map.insert(key, new_entry);
+          self.insert(key, value);
+          self.length += 1;
         }
       }
     }
   }
 
-  // pop() remove the entry from map, detach the entry from head of linked-list, and return it
-  fn pop(&mut self) -> Option<Box<LRUEntry>> {
-    let next;
-    unsafe { next = (*self.head).next }
-    // list is empty
-    if next == self.tail {
-      return None;
+  pub fn put2(&mut self, key: i32, value: i32) {
+    // if key exists, remove head and push_back an entity with new value
+    if let Some(entry) = self.map.get_mut(&key) {
+      self.remove(entry);
+      self.insert(key, value);
+      return;
     }
-    let key = unsafe { (*next).key };
-    let mut old_entry = self.map.remove(&key).unwrap();
-    self.detach(&mut *old_entry);
-    Some(old_entry)
-  }
 
-  // push() pushs an entry to the tail of linked-list
-  fn push(&mut self, entry: *mut LRUEntry) {
-    unsafe {
-      // prev <-> tail
-      // prev <-> entry <-> tail
-      (*entry).prev = (*self.tail).prev;
-      (*entry).next = self.tail;
-      (*self.tail).prev = entry;
-      (*(*entry).prev).next = entry;
+    // when key does not exist
+    if self.length >= self.capacity {
+      self.remove(self.head.as_ref());
+      self.insert(key, value);
+    } else {
+      self.insert(key, value);
+      self.length += 1;
     }
   }
-
-  // detach() remove an entry from the linked-list
-  fn detach(&mut self, entry: *mut LRUEntry) {
-    unsafe {
-      // prev <-> entry <-> next
-      // prev <-> next
-      (*(*entry).prev).next = (*entry).next;
-      (*(*entry).next).prev = (*entry).prev;
+  //-------------------------------
+  // 2 utility functions
+  // remove an entry from the linked-list and map
+  fn remove(&mut self, entry: &LRUEntry) {
+    // 1. remove the entry from linked-list
+    let prev = entry.prev;
+    let next = entry.next;
+    if let Some(prev) = entry.prev {
+      prev.next = next;
     }
+    if let Some(next) = entry.next {
+      next.prev = prev;
+    }
+
+    /* js code:
+    if self.head == entry {
+      self.head = next;
+    }
+    if self.tail == entry {
+      self.tail = prev;
+    }
+    */
+    if let Some(head) = self.head {
+      if head == entry {
+        self.head = next;
+      }
+    }
+
+    // 2. remove entity from hashmap
+    self.map.remove(&entry.key);
+  }
+
+  // insert key-val into hashmap and push an entry to the tail of linked-list
+  fn insert(&mut self, key: i32, val: i32) {
+    let newEntry = Box::new(LRUEntry::new(key, val));
+
+    if let Some(tail) = self.tail {
+      // append new entry to the tail of the linked-list
+      tail.next = Some(newEntry);
+      newEntry.prev = Some(tail);
+      self.tail = tail.next;
+    } else {
+      // if linked-list is empty
+      self.tail = Some(newEntry);
+      self.head = Some(newEntry);
+    }
+    self.map.insert(key, newEntry);
   }
 }
 

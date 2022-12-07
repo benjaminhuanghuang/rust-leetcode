@@ -5,6 +5,25 @@
   let mut hm: HashMap<i32, i32> = HashMap::new();
 ```
 
+## Insert
+```
+let mut hash_map:HashMap<String, String> = HashMap::new();
+ 
+hash_map.insert("1".to_string(), "A".to_string());
+hash_map.insert("2".to_string(), "B".to_string());
+```
+
+
+## Access
+
+```
+ // 接受一个引用并返回 Option<&V>
+  match contacts.get(&"Daniel") {
+      Some(&number) => println!("Calling Daniel: {}", call(number)),
+      _ => println!("Don't have Daniel's number."),
+  }
+```
+
 
 ## Is exist 
 Use HashMap.contains_key()
@@ -31,7 +50,11 @@ Use HashMap.get()
 
 ## loop
 ```
-  
+  // `HashMap::iter()` 返回一个迭代器，该迭代器以任意顺序举出
+  // (&'a key, &'a value) 对。
+  for (contact, &number) in contacts.iter() {
+      println!("Calling {}: {}", contact, call(number)); 
+  }
 ```
 
 ## count chars in a string
