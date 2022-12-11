@@ -29,7 +29,7 @@
             If reach capacity, push_back,
             else capacity, pop_front, push_back,
 */
-use std::{borrow::Borrow, collections::HashMap};
+use std::collections::HashMap;
 
 // Entry is either a map entry and a link-list node
 pub struct LRUEntry {
