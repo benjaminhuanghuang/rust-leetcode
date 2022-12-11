@@ -122,13 +122,11 @@ impl LRUCache {
   // remove an entry from the linked-list and map
   fn remove(&mut self, entry: &LRUEntry) {
     // 1. remove the entry from linked-list
-    let prev = entry.prev;
-    let next = entry.next;
-    if let Some(prev) = entry.prev {
-      prev.next = next;
+    if entry.prev.is_some() {
+      entry.prev.as_ref().unwrap().next = entry.next;
     }
-    if let Some(next) = entry.next {
-      next.prev = prev;
+    if entry.next.is_some() {
+      entry.next.as_ref().unwrap().prev = entry.prev;
     }
 
     /* js code:
@@ -139,11 +137,17 @@ impl LRUCache {
       self.tail = prev;
     }
     */
-    if let Some(head) = self.head {
-      if head == entry {
-        self.head = next;
-      }
-    }
+    // if let Some(head) = self.head {
+    //   if head.as_ref() == entry {
+    //     self.head = next;
+    //   }
+    // }
+
+    // if let Some(tail) = self.tail {
+    //   if tail.as_ref() == entry {
+    //     self.head = next;
+    //   }
+    // }
 
     // 2. remove entity from hashmap
     self.map.remove(&entry.key);

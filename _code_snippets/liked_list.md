@@ -1,4 +1,9 @@
 
+## Dummy header
+```
+    let mut dummy = Some(Box::new(ListNode::new(-1)));
+```
+ 
 ## iteration  
 ```
   type List = Option<Box<ListNode>>
