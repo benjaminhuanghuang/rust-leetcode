@@ -4,7 +4,17 @@
     let mut dummy = Some(Box::new(ListNode::new(-1)));
 ```
  
+
 ## iteration  
+```
+  let mut head: Option<Box<ListNode>> = head;
+
+  while let Some(mut node) = head {
+    // cut off the first node in thr original list, it is pointed by head
+    head = node.next;
+  }
+```
+
 ```
   type List = Option<Box<ListNode>>
 
@@ -15,8 +25,6 @@
   }
 ```
 
-
-## while loop
 ```
   let mut head = head;
   let mut reversed = None;
