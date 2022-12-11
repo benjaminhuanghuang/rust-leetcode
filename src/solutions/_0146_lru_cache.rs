@@ -32,6 +32,7 @@
 use std::collections::HashMap;
 
 // Entry is either a map entry and a link-list node
+#[derive(PartialEq)]
 pub struct LRUEntry {
   key: i32,
   val: i32,
@@ -81,7 +82,7 @@ impl LRUCache {
 
   pub fn put(&mut self, key: i32, value: i32) {
     match self.map.get(&key) {
-      // key existed
+      // key existed, remove head and push_back an entity with new value
       Some(entry) => {
         self.remove(entry);
         self.insert(key, value);
@@ -89,7 +90,7 @@ impl LRUCache {
       // new key
       None => {
         if self.length >= self.capacity {
-          self.remove(self.head);
+          self.remove(&(self.head.unwrap()));
           self.insert(key, value);
         } else {
           self.insert(key, value);
@@ -109,7 +110,7 @@ impl LRUCache {
 
     // when key does not exist
     if self.length >= self.capacity {
-      self.remove(self.head.as_ref());
+      self.remove(&(self.head.unwrap()));
       self.insert(key, value);
     } else {
       self.insert(key, value);
