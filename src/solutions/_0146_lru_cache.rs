@@ -105,7 +105,7 @@ impl LRUCache {
             // key does not exist, check capacity,
             if self.length >= self.capacity {
                 // remove oldest entry and insert new entry
-                self.remove(key, self.head.take().as_mut().unwrap());
+                //self.remove(key, self.head.take().as_mut().unwrap());
             } else {
                 self.length += 1;
             }
@@ -116,10 +116,10 @@ impl LRUCache {
     //-------------------------------
     // 2 utility functions
     // remove an entry from the double linked list and map
-    fn remove(&mut self, key: i32, entryPtr: &mut Rc<RefCell<LRUEntry>>) {
+    fn remove(&mut self, key: i32, entry_ptr: &mut Rc<RefCell<LRUEntry>>) {
         // 1. remove the entry from linked-list
         let (prev, next) = {
-            let mut node = entryPtr.borrow_mut();
+            let mut node = entry_ptr.borrow_mut();
             let prev = match node.prev.take() {
                 None => None,
                 Some(prev) => prev.upgrade(),
