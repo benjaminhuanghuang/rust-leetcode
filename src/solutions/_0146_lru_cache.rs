@@ -98,17 +98,18 @@ impl LRUCache {
 
         let ptr = if ptr.is_some() {
             // key existed: remove current entry and insert new entry
-            self.remove(key, ptr.as_ref());
+            let ptr = ptr.unwrap().upgrade();
+            self.remove(key, ptr.as_mut().unwrap());
             self.insert(key, value);
         } else {
-            // key does not exist, insert a new entry, check capacity
-            self.dlist.push_back(value);
-            if let Some(tail) = self.dlist.get_weak_tail() {
-                self.map.insert(key, tail);
-            }
-
-            if self.len() > self.capacity {
-                self.dlist.pop_front();
+            // key does not exist, check capacity,
+            if self.length >= self.capacity {
+                // remove oldest entry and insert new entry
+                self.remove(key, self.head.as_mut().unwrap());
+                self.insert(key, value);
+            } else {
+                self.insert(key, value);
+                self.length += 1;
             }
         };
     }
@@ -153,19 +154,23 @@ impl LRUCache {
 
     // insert key-entry into hashmap and back_push entry to double linked list
     fn insert(&mut self, key: i32, val: i32) {
-        let newEntry = Box::new(LRUEntry::new(val));
+        let mut node = LRUEntry::new(val);
 
-        if let Some(tail) = self.tail {
-            // append new entry to the tail of the linked-list
-            tail.next = Some(newEntry);
-            newEntry.prev = Some(tail);
-            self.tail = tail.next;
-        } else {
-            // if linked-list is empty
-            self.tail = Some(newEntry);
-            self.head = Some(newEntry);
+        match &mut self.tail.take() {
+            None => {
+                self.head = Some(Rc::new(RefCell::new(node)));
+                self.tail = self.head.clone();
+            }
+            Some(current_tail) => {
+                node.prev = Some(Rc::downgrade(&current_tail));
+                self.tail = Some(Rc::new(RefCell::new(node)));
+                current_tail.borrow_mut().next = self.tail.clone();
+            }
         }
-        self.map.insert(key, newEntry);
+
+        // add new entry to map
+        self.map
+            .insert(key, Rc::downgrade(self.head.as_mut().unwrap()));
     }
 }
 
