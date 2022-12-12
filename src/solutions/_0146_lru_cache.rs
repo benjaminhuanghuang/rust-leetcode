@@ -84,7 +84,7 @@ impl LRUCache {
         let ptr = ptr.upgrade();
         match ptr {
             None => -1,
-            Some(entry) => {
+            Some(mut entry) => {
                 let value = entry.borrow().val;
                 self.remove(key, &mut entry);
                 self.insert(key, value);
@@ -106,11 +106,10 @@ impl LRUCache {
             if self.length >= self.capacity {
                 // remove oldest entry and insert new entry
                 self.remove(key, self.head.as_mut().unwrap());
-                self.insert(key, value);
             } else {
-                self.insert(key, value);
                 self.length += 1;
             }
+            self.insert(key, value);
         };
     }
 
