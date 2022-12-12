@@ -28,7 +28,6 @@ pub struct Solution;
 // }
 
 /*
-
     node     node --> node --> node --> node --> None
                ^
                |
@@ -39,26 +38,30 @@ pub struct Solution;
 impl Solution {
     pub fn insertion_sort_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
         let mut head = head;
-
         let mut sorted = Some(Box::new(ListNode::new(-1)));
 
         while let Some(mut node) = head {
-            // cut off the first node in thr original list, it is pointed by head
-            head = node.next;
-            node.next = None;
+            // cut off the first node in thr original list, which is pointed by head
+            // head = node.next;
+            // node.next = None;
+            head = std::mem::take(&mut node.next);
 
             let mut p = &mut sorted;
             // find the insert position in the sorted list, which is pointed by p
             // skip the node which p.val < node.val
+            // p                   is &mut Option<Box<ListNode>>,
+            // p.as_ref            is Option<&Box<ListNode>>
+            // p.as_ref().unwrap() is &Box<ListNode>
             while p.as_ref().unwrap().next.is_some()
                 && p.as_ref().unwrap().next.as_ref().unwrap().val < node.val
             {
                 p = &mut p.as_mut().unwrap().next;
             }
 
-            // insert the node to the sorted list
+            // connect node with p.next
+            // take() set p.next to None
             node.next = std::mem::take(&mut p.as_mut().unwrap().next);
-
+            // connect p.next with node
             p.as_mut().unwrap().next = Some(node)
         }
 

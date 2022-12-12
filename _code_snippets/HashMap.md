@@ -24,6 +24,11 @@ hash_map.insert("2".to_string(), "B".to_string());
   }
 ```
 
+Read value use unwrap_or_else
+```
+ let value = *self.map.get(&key).unwrap_or_else(|| {&-1});
+```
+
 
 ## Is exist 
 Use HashMap.contains_key()
