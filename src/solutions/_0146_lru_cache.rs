@@ -37,14 +37,17 @@ use std::{
 
 pub struct LRUEntry {
     val: i32,
+    // when the oldest entry is deleted, we need to know the key add delete it form map
+    key: i32,
     next: Option<Rc<RefCell<LRUEntry>>>,
     prev: Option<Weak<RefCell<LRUEntry>>>,
 }
 
 impl LRUEntry {
-    pub fn new(val: i32) -> Self {
+    pub fn new(key: i32, val: i32) -> Self {
         LRUEntry {
-            val: val,
+            key,
+            val,
             prev: None,
             next: None,
         }
@@ -86,7 +89,7 @@ impl LRUCache {
             None => -1,
             Some(mut entry) => {
                 let value = entry.borrow().val;
-                self.remove(key, &mut entry);
+                self.remove(&mut entry);
                 self.insert(key, value);
                 value
             }
@@ -99,12 +102,18 @@ impl LRUCache {
         let ptr = if ptr.is_some() {
             // key existed: remove current entry and insert new entry
             let mut ptr = ptr.unwrap().upgrade();
-            self.remove(key, ptr.as_mut().unwrap());
+            self.remove(ptr.as_mut().unwrap());
             self.insert(key, value);
         } else {
             // key does not exist, check capacity,
             if self.length >= self.capacity {
                 // remove oldest entry and insert new entry
+                let mut tmp = self.head.take();
+                self.remove(tmp.as_mut().unwrap());
+                /*
+                    This line cause error
+                    cannot borrow `self.head` as mutable more than once at a time
+                */
                 //self.remove(key, self.head.take().as_mut().unwrap());
             } else {
                 self.length += 1;
@@ -116,7 +125,7 @@ impl LRUCache {
     //-------------------------------
     // 2 utility functions
     // remove an entry from the double linked list and map
-    fn remove(&mut self, key: i32, entry_ptr: &mut Rc<RefCell<LRUEntry>>) {
+    fn remove(&mut self, entry_ptr: &mut Rc<RefCell<LRUEntry>>) {
         // 1. remove the entry from linked-list
         let (prev, next) = {
             let mut node = entry_ptr.borrow_mut();
@@ -146,14 +155,14 @@ impl LRUCache {
                 prev.borrow_mut().next.replace(next);
             }
         }
-
         // 2. remove entity from hashmap
-        self.map.remove(&key);
+        let node = entry_ptr.borrow_mut();
+        self.map.remove(&node.key);
     }
 
     // insert key-entry into hashmap and back_push entry to double linked list
     fn insert(&mut self, key: i32, val: i32) {
-        let mut node = LRUEntry::new(val);
+        let mut node = LRUEntry::new(key, val);
 
         match &mut self.tail.take() {
             None => {
@@ -169,7 +178,7 @@ impl LRUCache {
 
         // add new entry to map
         self.map
-            .insert(key, Rc::downgrade(self.head.as_mut().unwrap()));
+            .insert(key, Rc::downgrade(self.tail.as_mut().unwrap()));
     }
 }
 
@@ -186,6 +195,10 @@ mod tests {
 
     #[test]
     fn test_146() {
+        test3();
+    }
+
+    fn test1() {
         println!("init cache");
         let mut lru_cache = LRUCache::new(2);
         lru_cache.put(1, 1);
@@ -194,9 +207,37 @@ mod tests {
 
         lru_cache.put(3, 3); // evicts key 2
         assert_eq!(lru_cache.get(2), -1); // returns -1 (not found)
+        assert_eq!(lru_cache.get(3), 3);
+
         lru_cache.put(4, 4); // evicts key 1
         assert_eq!(lru_cache.get(1), -1); // returns -1 (not found)
         assert_eq!(lru_cache.get(3), 3); // returns 3
         assert_eq!(lru_cache.get(4), 4); // returns 4
+    }
+
+    fn test2() {
+        let mut lru_cache = LRUCache::new(2);
+        assert_eq!(lru_cache.get(2), -1);
+
+        lru_cache.put(2, 6);
+        assert_eq!(lru_cache.get(2), 6);
+        assert_eq!(lru_cache.get(1), -1);
+        lru_cache.put(1, 5);
+        lru_cache.put(1, 2);
+        assert_eq!(lru_cache.get(1), 2);
+        assert_eq!(lru_cache.get(2), 6);
+    }
+
+    fn test3() {
+        let mut lru_cache = LRUCache::new(3);
+        lru_cache.put(1, 1);
+        lru_cache.put(2, 2);
+        lru_cache.put(3, 3);
+        lru_cache.put(4, 4);
+
+        assert_eq!(lru_cache.get(4), 4);
+        assert_eq!(lru_cache.get(3), 3);
+
+        assert_eq!(lru_cache.get(2), 2);
     }
 }
