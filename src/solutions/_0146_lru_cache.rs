@@ -37,8 +37,7 @@ use std::{
 
 pub struct LRUEntry {
     val: i32,
-    // when the oldest entry is deleted, we need to know the key add delete it form map
-    key: i32,
+    key: i32, // when pop_front entry, remove entry.key from map
     next: Option<Rc<RefCell<LRUEntry>>>,
     prev: Option<Weak<RefCell<LRUEntry>>>,
 }
@@ -74,6 +73,9 @@ impl LRUCache {
         }
     }
 
+    /*
+        access entry from map and move the entry to back
+    */
     pub fn get(&mut self, key: i32) -> i32 {
         let ptr = self.map.get_mut(&key);
 
@@ -82,50 +84,110 @@ impl LRUCache {
             return -1;
         }
 
-        // update by removing the current entry and inserting a new one
+        // update entry by move_entry_to_back
         let ptr = ptr.unwrap();
         let ptr = ptr.upgrade();
         match ptr {
             None => -1,
-            Some(mut entry) => {
-                let value = entry.borrow().val;
-                self.remove(&mut entry);
-                self.insert(key, value);
+            Some(entry_ptr) => {
+                let value = entry_ptr.borrow().val;
+                self.move_entry_to_back(entry_ptr);
                 value
             }
         }
     }
 
-    pub fn put(&mut self, key: i32, value: i32) {
+    /*
+        if key existed, update the value of the entry and move_entry_to_back
+        if not, create a new entry and push new entry to back
+    */
+    pub fn put(&mut self, key: i32, val: i32) {
         let ptr = self.map.get_mut(&key);
-
         let ptr = if ptr.is_some() {
-            // key existed: remove current entry and insert new entry
-            let mut ptr = ptr.unwrap().upgrade();
-            self.remove(ptr.as_mut().unwrap());
-            self.insert(key, value);
+            ptr.unwrap().upgrade()
         } else {
-            // key does not exist, check capacity,
-            if self.length >= self.capacity {
-                // remove oldest entry and insert new entry
-                let mut tmp = self.head.take();
-                self.remove(tmp.as_mut().unwrap());
-                /*
-                    This line cause error
-                    cannot borrow `self.head` as mutable more than once at a time
-                */
-                //self.remove(key, self.head.take().as_mut().unwrap());
-            } else {
-                self.length += 1;
-            }
-            self.insert(key, value);
+            None
         };
+
+        match ptr {
+            None => {
+                // can be not in the map or null pointer
+                // create a new entry and insert it to back
+                // check capacity
+                let entry = LRUEntry::new(key, val);
+                self.push_entry_back(Rc::new(RefCell::new(entry)));
+                if let Some(tail) = self.get_weak_tail() {
+                    self.map.insert(key, tail);
+                }
+                if self.length > self.capacity {
+                    let key = self.pop_front();
+                    self.map.remove(&key.unwrap());
+                }
+            }
+            Some(entry) => {
+                // update the value in the entry and move it to back
+                entry.borrow_mut().val = val;
+                self.move_entry_to_back(entry)
+            }
+        }
     }
 
     //-------------------------------
-    // 2 utility functions
-    // remove an entry from the double linked list and map
-    fn remove(&mut self, entry_ptr: &mut Rc<RefCell<LRUEntry>>) {
+    // Utility functions
+    fn get_weak_tail(&self) -> Option<Weak<RefCell<LRUEntry>>> {
+        match &self.tail {
+            None => None,
+            Some(tail) => Some(Rc::downgrade(tail)),
+        }
+    }
+
+    fn pop_front(&mut self) -> Option<i32> {
+        match self.head.take() {
+            None => None,
+            Some(head) => {
+                let mut head = head.borrow_mut();
+                let next = head.next.take();
+
+                match next {
+                    None => {
+                        self.tail.take();
+                    }
+                    Some(next) => {
+                        next.borrow_mut().prev = None;
+                        self.head = Some(next)
+                    }
+                }
+                self.length -= 1;
+                Some(head.key)
+            }
+        }
+    }
+
+    fn move_entry_to_back(&mut self, mut entry_ptr: Rc<RefCell<LRUEntry>>) {
+        self.remove_entry_from_list(&mut entry_ptr);
+        self.push_entry_back(entry_ptr);
+    }
+
+    fn push_entry_back(&mut self, mut entry_ptr: Rc<RefCell<LRUEntry>>) {
+        match self.tail.take() {
+            None => {
+                self.head.replace(entry_ptr);
+                self.tail = self.head.clone();
+            }
+            Some(current_tail) => {
+                entry_ptr
+                    .borrow_mut()
+                    .prev
+                    .replace(Rc::downgrade(&current_tail));
+
+                self.tail.replace(entry_ptr);
+                current_tail.borrow_mut().next = self.tail.clone();
+            }
+        }
+        self.length += 1;
+    }
+
+    fn remove_entry_from_list(&mut self, entry_ptr: &mut Rc<RefCell<LRUEntry>>) {
         // 1. remove the entry from linked-list
         let (prev, next) = {
             let mut node = entry_ptr.borrow_mut();
@@ -139,15 +201,18 @@ impl LRUCache {
 
         match (prev, next) {
             (None, None) => {
+                // entry_ptr is the only entry in the list
                 self.head = None;
                 self.tail = None;
             }
             (None, Some(next)) => {
+                // entry_ptr is head
                 next.borrow_mut().prev = None;
                 self.head.replace(next);
             }
             (Some(prev), None) => {
-                prev.borrow_mut().prev = None;
+                // entry_ptr is tail
+                prev.borrow_mut().next = None;
                 self.tail.replace(prev);
             }
             (Some(prev), Some(next)) => {
@@ -155,30 +220,7 @@ impl LRUCache {
                 prev.borrow_mut().next.replace(next);
             }
         }
-        // 2. remove entity from hashmap
-        let node = entry_ptr.borrow_mut();
-        self.map.remove(&node.key);
-    }
-
-    // insert key-entry into hashmap and back_push entry to double linked list
-    fn insert(&mut self, key: i32, val: i32) {
-        let mut node = LRUEntry::new(key, val);
-
-        match &mut self.tail.take() {
-            None => {
-                self.head = Some(Rc::new(RefCell::new(node)));
-                self.tail = self.head.clone();
-            }
-            Some(current_tail) => {
-                node.prev = Some(Rc::downgrade(&current_tail));
-                self.tail = Some(Rc::new(RefCell::new(node)));
-                current_tail.borrow_mut().next = self.tail.clone();
-            }
-        }
-
-        // add new entry to map
-        self.map
-            .insert(key, Rc::downgrade(self.tail.as_mut().unwrap()));
+        self.length -= 1;
     }
 }
 
@@ -195,6 +237,10 @@ mod tests {
 
     #[test]
     fn test_146() {
+        //test1();
+
+        //test2();
+
         test3();
     }
 
