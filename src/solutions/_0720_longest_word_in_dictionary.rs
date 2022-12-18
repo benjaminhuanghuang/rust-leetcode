@@ -6,29 +6,53 @@
     Medium
 */
 use std::collections::HashMap;
-
-pub struct Solution;
-
+#[derive(Default)]
 struct TrieNode {
-    value: Option<char>,
-    is_end: bool,
     children: HashMap<char, TrieNode>,
+    is_end: bool,
 }
 
 impl TrieNode {
-    pub fn view(c: char, is_end: bool) -> Self {
-        Self {
-            value: Option::Some(c),
-            is_end,
-            children: HashMap::new(),
+    fn insert(&mut self, word: String, longest: &mut String) {
+        let mut node = self;
+        let mut is_new_word = true;
+
+        for (i, c) in word.chars().enumerate() {
+            node = node.children.entry(c).or_default();
+            if i == word.len() - 1 {
+                node.is_end = true;
+            }
+            if node.is_end == false {
+                is_new_word = false;
+            }
+        }
+
+        if is_new_word == false {
+            return;
+        }
+        if longest.len() < word.len() || (longest.len() == word.len() && word < longest.to_string())
+        {
+            longest.clear();
+            longest.extend(word.chars());
         }
     }
-
-    pub fn check(&self, c: char) -> bool {}
 }
+pub struct Solution;
+
 impl Solution {
     pub fn longest_word(words: Vec<String>) -> String {
-        String::new()
+        // sort the words
+        let mut words = words;
+        words.sort_by(|a, b| a.len().cmp(&b.len()));
+
+        // create Trie
+        let mut trie = TrieNode::default();
+
+        let mut result = String::new();
+        for word in words {
+            trie.insert(word, &mut result);
+        }
+        result
     }
 }
 
