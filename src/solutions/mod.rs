@@ -21,3 +21,4 @@ pub mod _0442_find_all_duplicates_in_an_array;
 pub mod _0461_hamming_distance;
 pub mod _0146_lru_cache;
 pub mod _0147_insertion_sort_list;
+pub mod _0720_longest_word_in_dictionary;
