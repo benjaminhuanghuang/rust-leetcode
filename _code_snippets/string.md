@@ -10,6 +10,15 @@
     
   }
 ```
+Use index
+```
+ for (i, c) in word.chars().enumerate() {
+    if i == word.len() - 1 {
+      //  TODO:
+    }
+            
+ }
+```
 
 ## count chars in a string
 ```
