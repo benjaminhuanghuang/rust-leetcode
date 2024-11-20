@@ -1,6 +1,7 @@
+mod bitwise;
+mod other; // Import the models module
+mod utils; // Import the utils module // Import the services module
+
 fn main() {
-  println!(
-    "{}",
-    Solution::find_median_sorted_arrays(vec![2, 3, 4, 5, 6], vec![1])
-  );
+  println!("hello world");
 }

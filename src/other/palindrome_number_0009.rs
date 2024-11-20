@@ -30,6 +30,6 @@ mod tests {
 
   #[test]
   fn test_success() {
-    assert_eq!(Solution::do_something(), vec![0]);
+    assert_eq!(Solution::is_palindrome(1), true);
   }
 }

@@ -6,7 +6,7 @@
     Medium
 */
 
-use crate::util::tree_node::TreeNode;
+use crate::utils::tree_node::TreeNode;
 
 pub struct Solution;
 
@@ -80,7 +80,7 @@ impl Solution {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::{tree, util::tree_node::to_tree};
+  use crate::{tree, utils::tree_node::to_tree};
 
   #[test]
   fn test_1302() {
