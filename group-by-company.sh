@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+#
+#
 
 # Prompt the user for the company name
 read -p "Enter the company name: " company_name
