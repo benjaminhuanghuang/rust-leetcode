@@ -1,4 +1,7 @@
 #!/bin/bash
+# 
+# Append module declarations to mod.rs in the specified directory
+#
 
 # Directory containing the Rust files (e.g., src/utils)
 TARGET_DIR="$1"
