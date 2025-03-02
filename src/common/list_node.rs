@@ -1,12 +1,11 @@
 // Definition for singly-linked list.
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ListNode {
   pub val: i32,
   pub next: Option<Box<ListNode>>,
 }
 
 impl ListNode {
-  #[inline]
   pub fn new(val: i32) -> Self {
     ListNode { next: None, val }
   }
@@ -63,16 +62,41 @@ mod tests {
   use super::*;
   #[test]
   fn test_list_equal_success() {
-    assert!(list_equal(to_list(vec![3, 2, 1]), to_list(vec![3, 2, 1])));
+    let list = to_list(vec![3, 2, 1]);
+    let expected_list = Some(Box::new(ListNode {
+      val: 3,
+      next: Some(Box::new(ListNode {
+        val: 2,
+        next: Some(Box::new(ListNode { val: 1, next: None })),
+      })),
+    }));
+
+    assert_eq!(list, expected_list);
   }
 
   #[test]
   fn test_list_equal_different_len_success() {
-    assert!(!list_equal(to_list(vec![3, 2]), to_list(vec![3, 2, 1])));
+    let list = to_list(vec![3, 2]);
+    let expected_list = Some(Box::new(ListNode {
+      val: 3,
+      next: Some(Box::new(ListNode {
+        val: 2,
+        next: Some(Box::new(ListNode { val: 1, next: None })),
+      })),
+    }));
+    assert_ne!(list, expected_list);
   }
 
   #[test]
   fn test_list_equal_failed() {
-    assert!(!list_equal(to_list(vec![3, 1, 1]), to_list(vec![3, 2, 1])));
+    let list = to_list(vec![3, 2, 2]);
+    let expected_list = Some(Box::new(ListNode {
+      val: 3,
+      next: Some(Box::new(ListNode {
+        val: 2,
+        next: Some(Box::new(ListNode { val: 1, next: None })),
+      })),
+    }));
+    assert_ne!(list, expected_list);
   }
 }
