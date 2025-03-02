@@ -5,6 +5,10 @@ use std::rc::Rc;
 #[derive(Debug, PartialEq, Eq)]
 pub struct TreeNode {
   pub val: i32,
+  // `Option` represents a value that might not be there
+  // `Rc` stands for Reference Counted keeps track of the number of references to an object in memory.
+  //      It is used for shared ownership of the object, and will clean up the object when the last reference is dropped.
+  // `RefCell` provides a way to borrow data mutably
   pub left: Option<Rc<RefCell<TreeNode>>>,
   pub right: Option<Rc<RefCell<TreeNode>>>,
 }
