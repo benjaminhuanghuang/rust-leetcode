@@ -6,7 +6,7 @@
     Medium
 */
 
-use crate::utils::tree_node::TreeNode;
+use crate::common::tree_node::TreeNode;
 
 pub struct Solution;
 

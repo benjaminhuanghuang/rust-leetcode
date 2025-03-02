@@ -6,15 +6,12 @@
   Medium
 */
 
-use crate::utils::list_node::ListNode;
+use crate::common::list_node::ListNode;
 
 pub struct Solution;
 
 impl Solution {
-  pub fn add_two_numbers(
-    l1: Option<Box<ListNode>>,
-    l2: Option<Box<ListNode>>,
-  ) -> Option<Box<ListNode>> {
+  pub fn add_two_numbers(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
     let mut l1 = &l1;
     let mut l2 = &l2;
 
@@ -44,7 +41,7 @@ impl Solution {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::utils::list_node::to_list;
+  use crate::common::list_node::to_list;
 
   #[test]
   fn test_add_two_numbers_success() {

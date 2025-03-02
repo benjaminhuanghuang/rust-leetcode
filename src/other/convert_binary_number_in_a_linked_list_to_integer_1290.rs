@@ -5,7 +5,7 @@
 
   Easy
 */
-use crate::utils::list_node::ListNode;
+use crate::common::list_node::ListNode;
 
 pub struct Solution;
 

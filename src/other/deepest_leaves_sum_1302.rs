@@ -6,7 +6,7 @@
     Medium
 */
 
-use crate::utils::tree_node::TreeNode;
+use crate::common::tree_node::TreeNode;
 
 pub struct Solution;
 
@@ -80,7 +80,7 @@ impl Solution {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::{tree, utils::tree_node::to_tree};
+  use crate::{common::tree_node::to_tree, tree};
 
   #[test]
   fn test_1302() {
@@ -90,9 +90,7 @@ mod tests {
     );
 
     assert_eq!(
-      Solution::deepest_leaves_sum(tree![
-        6, 7, 8, 2, 7, 1, 3, 9, null, 1, 4, null, null, null, 5
-      ]),
+      Solution::deepest_leaves_sum(tree![6, 7, 8, 2, 7, 1, 3, 9, null, 1, 4, null, null, null, 5]),
       19
     );
   }
