@@ -1,7 +1,11 @@
 mod bitwise;
-mod other; // Import the models module
-mod utils; // Import the utils module // Import the services module
+mod other;
+mod string;
+mod utils;
 
 fn main() {
-  println!("hello world");
+  assert_eq!(
+    bitwise::hamming_distance_0461::Solution::hamming_distance(1, 4),
+    2
+  );
 }

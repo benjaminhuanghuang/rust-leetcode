@@ -1,16 +1,22 @@
 /*
-    461. Hamming Distance
+  461. Hamming Distance
 
-    https://leetcode.com/problems/hamming-distance/
+  https://leetcode.com/problems/hamming-distance/
 
-    Easy
+  Easy
 */
 
 pub struct Solution;
 
+/*
+Hamming distance is a measure of the difference between two strings of equal length.
+It is defined as the number of positions at which the corresponding symbols differ.
+
+The Hamming distance is equal to the number of 1s in a XOR b.
+*/
 impl Solution {
   /*
-  对于二进制串ａ和ｂ来说，汉明距离等于ａ xor ｂ中１的数目
+  Count the number of 1s in the XOR result of two numbers.
   */
   pub fn hamming_distance(x: i32, y: i32) -> i32 {
     (x ^ y).count_ones() as i32
@@ -34,39 +40,6 @@ impl Solution {
       xor &= xor - 1;
     }
     return distance;
-  }
-
-  /*
-    Hamming Distance between two string
-    https://www.youtube.com/watch?v=2t6bgm7gUoQ&t=58s
-  */
-  pub fn hamming_distance_str(s1: &str, s2: &str) -> Option<usize> {
-    if s1.len() != s2.len() {
-      None
-    } else {
-      let s1_chars = s1.chars();
-      let s2_chars = s2.chars();
-
-      let mut distance: usize = 0;
-      for (e1, e2) in s1_chars.zip(s2_chars) {
-        if e1 != e2 {
-          distance += 1;
-        }
-      }
-      Some(distance)
-    }
-  }
-  pub fn hamming_distance_str2(s1: &str, s2: &str) -> Option<usize> {
-    if s1.len() != s2.len() {
-      None
-    } else {
-      Some(
-        s1.chars()
-          .zip(s1.chars())
-          .map(|(e1, e2)| if e1 != e2 { 1 } else { 0 })
-          .sum(),
-      )
-    }
   }
 }
 
