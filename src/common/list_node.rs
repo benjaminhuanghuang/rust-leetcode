@@ -11,10 +11,10 @@ impl ListNode {
   }
 }
 
-type List = Option<Box<ListNode>>;
+// type List = Option<Box<ListNode>>;
 
 // to_list(vec![5, 6, 4])
-pub fn to_list2(vec: Vec<i32>) -> List {
+pub fn to_list2(vec: Vec<i32>) -> Option<Box<ListNode>> {
   let mut current = None;
   for &v in vec.iter().rev() {
     let mut node = ListNode::new(v);
